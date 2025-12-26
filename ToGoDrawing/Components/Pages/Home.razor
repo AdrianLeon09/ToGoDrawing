@@ -1,0 +1,24 @@
+﻿@page "/"
+@rendermode InteractiveServer
+
+@inject IJSRuntime JSruntime
+
+
+<canvas id="canvas" width="auto" height="auto" style="background-color:aliceblue"></canvas>
+
+
+
+
+@code {   
+    
+    protected override async Task OnAfterRenderAsync (bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSruntime.InvokeVoidAsync("DragEvents");
+           
+        }
+    }
+   
+    
+}

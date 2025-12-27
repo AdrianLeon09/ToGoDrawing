@@ -83,32 +83,31 @@ h1:focus {
 }
 #undo-draw{
     background-color:red;
-    display: flex; /* activa flexbox */
-    justify-content: center; /* centra horizontal */
-    align-items: center; /* centra vertical */
-    padding: 10px 20px; /* aumenta ligeramente el tamaño */
-    font-size: 16px; /* aumenta texto si quieres */
-    border: none; /* opcional, quita borde predeterminado */
-    border-radius: 4px; /* opcional, esquinas redondeadas */
-    cursor: pointer; /* cursor de puntero */
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    padding: 10px 20px; 
+    font-size: 16px; 
+    border: none; 
+    border-radius: 4px; 
+    cursor: pointer; 
 }
 #redo-draw {
     background-color: green;
-    display: flex; /* activa flexbox */
-    justify-content: center; /* centra horizontal */
-    align-items: center; /* centra vertical */
-    padding: 10px 20px; /* aumenta ligeramente el tamaño */
-    font-size: 16px; /* aumenta texto si quieres */
-    border: none; /* opcional, quita borde predeterminado */
-    border-radius: 4px; /* opcional, esquinas redondeadas */
-    cursor: pointer; /* cursor de puntero */
+    display: flex;
+    justify-content: center; 
+    align-items: center;
+    font-size: 16px; 
+    border: none; 
+    border-radius: 4px; 
+    cursor: pointer; 
     
 }
 #toolbar {
     display: flex;
-    justify-content: center; /* centra botones dentro de la toolbar */
-    margin-top: 12px; /* espacio entre canvas y toolbar */
-    gap: 10px; /* espacio entre botones */
+    justify-content: center; 
+    margin-top: 12px; 
+    gap: 10px; 
     background-color: black;
     padding: 0px 10px;
     border-radius: 4px;

@@ -1,5 +1,7 @@
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color:black;
+    
 }
 
 a, .btn-link {
@@ -58,3 +60,61 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+.page {
+    padding-top: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.canvas-container {
+    
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+   
+    background-color: red;
+}
+
+#drawing-background {
+    cursor: crosshair;
+ 
+}
+#undo-draw{
+    background-color:red;
+    display: flex; /* activa flexbox */
+    justify-content: center; /* centra horizontal */
+    align-items: center; /* centra vertical */
+    padding: 10px 20px; /* aumenta ligeramente el tamaño */
+    font-size: 16px; /* aumenta texto si quieres */
+    border: none; /* opcional, quita borde predeterminado */
+    border-radius: 4px; /* opcional, esquinas redondeadas */
+    cursor: pointer; /* cursor de puntero */
+}
+#redo-draw {
+    background-color: green;
+    display: flex; /* activa flexbox */
+    justify-content: center; /* centra horizontal */
+    align-items: center; /* centra vertical */
+    padding: 10px 20px; /* aumenta ligeramente el tamaño */
+    font-size: 16px; /* aumenta texto si quieres */
+    border: none; /* opcional, quita borde predeterminado */
+    border-radius: 4px; /* opcional, esquinas redondeadas */
+    cursor: pointer; /* cursor de puntero */
+    
+}
+#toolbar {
+    display: flex;
+    justify-content: center; /* centra botones dentro de la toolbar */
+    margin-top: 12px; /* espacio entre canvas y toolbar */
+    gap: 10px; /* espacio entre botones */
+    background-color: black;
+    padding: 0px 10px;
+    border-radius: 4px;
+}
+
+
+
+
+

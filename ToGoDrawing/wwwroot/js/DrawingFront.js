@@ -1,23 +1,19 @@
 ﻿window.DragEvents = function () {
 
-    const canvas = document.getElementById("canvas");
+    const canvas = document.getElementById("drawing-background");
     const ctx = canvas.getContext("2d");
 
     let Points = [];
     let drawing = false;
     let lastX = 0;
     let lastY = 0;
-    document.body.style.cursor = "crosshair";
+    
 
-    function resizeCanvas() {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-    }
-    resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+   
 
 
     canvas.addEventListener("mousedown", (e) => {
+
         drawing = true;
         lastX = e.offsetX;
         lastY = e.offsetY;

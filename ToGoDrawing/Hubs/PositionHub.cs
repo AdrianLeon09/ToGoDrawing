@@ -2,9 +2,10 @@
 {
     public class PositionHub
     {
-        public async Task SendPositons(float MoveToX, float MoveToY, float LineToX, float LineToY) {
+        public async Task SendPositons(float moveToX, float moveToY, float lineToX, float lineToY) {
         
         
         }
     }
 }
+ 

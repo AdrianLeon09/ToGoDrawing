@@ -1,193 +1,207 @@
-﻿let pencilMode = "";
-let currentIndex =  0 ; /* Index of the path currently rendered*/
-let drawing = false;
-let internalStrokes = [];
-let externalStrokes = []
-let updateDraw = false;
-let temporalInternalStroke = [];
-const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/SendStrokesServer")
-    .withAutomaticReconnect()
-    .build();
-let lastSendTime = 0;
-const sendInterval = 30; 
+﻿// --- State & Constants ---
+const state = {
+    pencilMode: "",
+    currentIndex: 0, // Index of the path currently rendered
+    drawing: false,
+    internalStrokes: [],
+    externalStrokes: [],
+    temporalInternalStrokes: [],
+    lastSendTime: 0,
+    sendInterval: 30, // milliseconds
+    defaultSizeEraser: 20,
+    currentStrokeIndex: 0
+};
 
 window.canvasGlobal = {
     canvas: null,
     ctx: null
 };
 
-async function start() {
+// --- SignalR Connection ---
+const connection = new signalR.HubConnectionBuilder()
+    .withUrl("/SendStrokesServer")
+    .withAutomaticReconnect()
+    .build();
+
+async function startSignalR() {
     try {
         await connection.start();
         console.log("SignalR Connected.");
     } catch (err) {
-        console.log(err);
-        setTimeout(start, 5000);
+        console.error("SignalR Connection Error:", err);
+        setTimeout(startSignalR, 5000);
     }
 }
-connection.onclose(async () => {await start();});
-connection.on("ReceiveStrokes", function (strokes){
-    console.log(strokes);
-   externalStrokes = strokes;
-   DrawExternalStrokes(externalStrokes);
-        
+
+connection.onclose(async () => {
+    await startSignalR();
+});
+
+connection.on("ReceiveStrokes", (strokes) => {
+    console.log("Received strokes:", strokes);
+    state.externalStrokes = strokes;
+    window.DrawExternalStrokes(state.externalStrokes);
 });
 
 window.SendInternalStrokes = async function () {
     if (connection.state === signalR.HubConnectionState.Connected) {
         try {
-            await connection.invoke("SendStrokesServer", internalStrokes);
+            await connection.invoke("SendStrokesServer", state.internalStrokes);
         } catch (err) {
-            console.error(err);
+            console.error("Error sending strokes:", err);
         }
     } else {
-        console.log("Connection not established yet");
+        console.warn("Connection not established yet");
+    }
+};
+
+// Initialize SignalR
+startSignalR();
+
+// --- Canvas Utilities ---
+function getCanvasCoords(e, canvas) {
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+
+    return {
+        x: (e.clientX - rect.left) * scaleX,
+        y: (e.clientY - rect.top) * scaleY
+    };
+}
+
+function clearCanvas() {
+    if (window.canvasGlobal.ctx && window.canvasGlobal.canvas) {
+        window.canvasGlobal.ctx.clearRect(0, 0, window.canvasGlobal.canvas.width, window.canvasGlobal.canvas.height);
     }
 }
 
-//start the connection SignalR
-    start();
+// --- Public API (Window Functions) ---
 
-    window.initCanvas = function () {
-        let lastX = 0;
-        let lastY = 0;
-        let defaultSizeEraser = 20;
-        let currentStroke = 0;
-        const canvas = document.getElementById("drawing-background");
-        const ctx = canvas.getContext("2d");
-        window.canvasGlobal.canvas = canvas;
-        window.canvasGlobal.ctx = ctx;
-
-        function getCanvasCoords(e) {
-            const rect = canvas.getBoundingClientRect();
-            const scaleX = canvas.width / rect.width;
-            const scaleY = canvas.height / rect.height;
-
-            return {
-                x: (e.clientX - rect.left) * scaleX,
-                y: (e.clientY - rect.top) * scaleY
-            };
-        }
-
-        canvas.addEventListener("mousedown", (e) => {
-            internalStrokes.push({points: [], color: "#000000"});
-            currentStroke = internalStrokes.length - 1;
-            currentIndex = internalStrokes.length;
-            drawing = true;
-            const pos = getCanvasCoords(e);
-            lastX = pos.x;
-            lastY = pos.y;
-
-
-        });
-
-
-
-canvas.addEventListener("mousemove", (e) => {
-    const pos = getCanvasCoords(e);
-    
-    if (pencilMode === "pencil" && drawing) {
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(pos.x, pos.y);
-        internalStrokes[currentStroke].points.push({x: pos.x, y: pos.y});
-        ctx.stroke();
-        lastX = pos.x;
-        lastY = pos.y;
-    }
-    if (pencilMode === "eraser" && drawing) {
-        ctx.clearRect(pos.x, pos.y, defaultSizeEraser, defaultSizeEraser);
-    }
-
-    const now = Date.now();
-    if (now - lastSendTime > sendInterval) {
-        SendInternalStrokes();
-        lastSendTime = now;
-    }
-});
-
-        canvas.addEventListener("mouseup", () => {
-            drawing = false;
-            if (pencilMode === "eraser") {
-                internalStrokes.pop();
-                currentIndex = internalStrokes.length;
-            }
-
-            temporalInternalStroke = [...internalStrokes];
-            currentIndex = internalStrokes.length;
-        });
-
-        canvas.addEventListener("mouseleave", () => {
-            drawing = false;
-            if (pencilMode === "eraser") {
-                internalStrokes.pop();
-                currentIndex = internalStrokes.length;
-            }
-
-            temporalInternalStroke = [...internalStrokes];
-            currentIndex = internalStrokes.length;
-        });
-    }
-
-    window.undoDrawing = function () {
-        updateDraw = true;
-        
-        if (internalStrokes.length === 0) {
-            console.log("There are no more drawings to Undo");
-            return;
-        } else {
-            window.canvasGlobal.ctx.clearRect(0, 0, canvasGlobal.canvas.width, canvasGlobal.canvas.height);
-            internalStrokes.pop();
-            currentIndex = internalStrokes.length;
-            window.renderDrawing(internalStrokes);
-        }
-        SendInternalStrokes()
-        window.renderDrawing(externalStrokes);
-        }
-
-    window.redoDrawing = function () {
-
-    if (currentIndex >= temporalInternalStroke.length) {
+window.initCanvas = function () {
+    const canvas = document.getElementById("drawing-background");
+    if (!canvas) {
+        console.error("Canvas element 'drawing-background' not found.");
         return;
     }
-    internalStrokes.push(temporalInternalStroke[currentIndex]);
-    currentIndex++;
+    const ctx = canvas.getContext("2d");
+    window.canvasGlobal.canvas = canvas;
+    window.canvasGlobal.ctx = ctx;
 
-    window.renderDrawing(internalStrokes);
-    SendInternalStrokes()
-    window.renderDrawing(externalStrokes);
+    let lastX = 0;
+    let lastY = 0;
 
-}
+    canvas.addEventListener("mousedown", (e) => {
+        state.internalStrokes.push({ points: [], color: "#000000" });
+        state.currentStrokeIndex = state.internalStrokes.length - 1;
+        state.currentIndex = state.internalStrokes.length;
+        state.drawing = true;
 
-    window.DrawExternalStrokes = function (externalStrokes) {
-    canvasGlobal.ctx.clearRect(0, 0, canvasGlobal.canvas.width, canvasGlobal.canvas.height);
-    window.renderDrawing(internalStrokes);
-    window.renderDrawing(externalStrokes);
-}
+        const pos = getCanvasCoords(e, canvas);
+        lastX = pos.x;
+        lastY = pos.y;
+    });
 
-    window.renderDrawing = function (strokeObj){
-        
-    for (let stroke of strokeObj) {
-        
-        let x = stroke.points[0].x;
-        let y = stroke.points[0].y;
-        window.canvasGlobal.ctx.beginPath();
-        window.canvasGlobal.ctx.moveTo(x, y);
-        for (let i = 0; i < stroke.points.length; i++) {
-            let p = stroke.points[i];
-            window.canvasGlobal.ctx.lineTo(p.x, p.y);
-            window.canvasGlobal.ctx.stroke();
+    canvas.addEventListener("mousemove", (e) => {
+        const pos = getCanvasCoords(e, canvas);
+
+        if (state.drawing) {
+            if (state.pencilMode === "pencil") {
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(pos.x, pos.y);
+                state.internalStrokes[state.currentStrokeIndex].points.push({ x: pos.x, y: pos.y });
+                ctx.stroke();
+                lastX = pos.x;
+                lastY = pos.y;
+            } else if (state.pencilMode === "eraser") {
+                ctx.clearRect(pos.x, pos.y, state.defaultSizeEraser, state.defaultSizeEraser);
+            }
+
+            // Throttle SignalR updates
+            const now = Date.now();
+            if (now - state.lastSendTime > state.sendInterval) {
+                window.SendInternalStrokes();
+                state.lastSendTime = now;
+            }
         }
-    }
-}
+    });
 
-    window.setModePencil = function () {
-        window.canvasGlobal.canvas.style.cursor = "url('icons/point.png') 16 16, auto";
-        pencilMode = "pencil";
+    const handleMouseUpOrLeave = () => {
+        if (!state.drawing) return;
+        
+        state.drawing = false;
+        if (state.pencilMode === "eraser") {
+            state.internalStrokes.pop();
+        }
+
+        state.temporalInternalStrokes = [...state.internalStrokes];
+        state.currentIndex = state.internalStrokes.length;
+    };
+
+    canvas.addEventListener("mouseup", handleMouseUpOrLeave);
+    canvas.addEventListener("mouseleave", handleMouseUpOrLeave);
+};
+
+window.undoDrawing = function () {
+    if (state.internalStrokes.length === 0) {
+        console.log("There are no more drawings to Undo");
+        return;
     }
+
+    state.internalStrokes.pop();
+    state.currentIndex = state.internalStrokes.length;
     
-    window.setModeEraser = function () {
-        pencilMode = "eraser";
+    window.DrawExternalStrokes(state.externalStrokes);
+    window.SendInternalStrokes();
+};
+
+window.redoDrawing = function () {
+    if (state.currentIndex >= state.temporalInternalStrokes.length) {
+        return;
+    }
+
+    state.internalStrokes.push(state.temporalInternalStrokes[state.currentIndex]);
+    state.currentIndex++;
+
+    window.DrawExternalStrokes(state.externalStrokes);
+    window.SendInternalStrokes();
+};
+
+window.DrawExternalStrokes = function (externalStrokes) {
+    state.externalStrokes = externalStrokes;
+    clearCanvas();
+    window.renderDrawing(state.internalStrokes);
+    window.renderDrawing(state.externalStrokes);
+};
+
+window.renderDrawing = function (strokes) {
+    const ctx = window.canvasGlobal.ctx;
+    if (!ctx || !strokes) return;
+
+    strokes.forEach(stroke => {
+        if (stroke.points && stroke.points.length > 0) {
+            ctx.beginPath();
+            ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
+            stroke.points.forEach(p => {
+                ctx.lineTo(p.x, p.y);
+            });
+            ctx.stroke();
+        }
+    });
+};
+
+window.setModePencil = function () {
+    if (window.canvasGlobal.canvas) {
+        window.canvasGlobal.canvas.style.cursor = "url('icons/point.png') 16 16, auto";
+    }
+    state.pencilMode = "pencil";
+};
+
+window.setModeEraser = function () {
+    if (window.canvasGlobal.canvas) {
         window.canvasGlobal.canvas.style.cursor = "url('icons/eraser-cursor32px.png') 0 0, auto";
     }
+    state.pencilMode = "eraser";
+};
     

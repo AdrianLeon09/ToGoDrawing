@@ -1,4 +1,5 @@
 using ToGoDrawing.Components;
+using ToGoDrawing.Presentation.Hubs;
 
 namespace ToGoDrawing
 {
@@ -12,11 +13,12 @@ namespace ToGoDrawing
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
             
-            builder.Services.AddSignalR();
-
-
-            var app = builder.Build();
+            builder.Services.AddSignalR(options =>
+            {
+                options.MaximumReceiveMessageSize = 2024 * 2024; // 1MB en lugar de 32KB
+            });
             
+            var app = builder.Build();
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
@@ -26,13 +28,11 @@ namespace ToGoDrawing
             }
 
             app.UseHttpsRedirection();
-
             app.UseAntiforgery();
-
             app.MapStaticAssets();
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
-
+            app.MapHub<StrokesHub>("/SendStrokesServer");
             app.Run();
         }
     }

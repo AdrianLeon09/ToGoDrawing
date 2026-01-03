@@ -15,4 +15,16 @@
     <PackageReference Include="Microsoft.JSInterop" Version="9.0.11" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Infrastructure\" />
+    <Folder Include="Presentation\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\signalr.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\signalr.js.map" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\signalr.min.js" />
+    <_ContentIncludedByDefault Remove="wwwroot\signalr\signalr.min.js.map" />
+  </ItemGroup>
+
 </Project>

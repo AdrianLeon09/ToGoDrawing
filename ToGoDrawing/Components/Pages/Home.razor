@@ -4,29 +4,30 @@
 @inject IJSRuntime JSruntime
 
     <div class="page">
-    <div class="canvas-container">
+        
+        <div class="canvas-container">
         <canvas id="drawing-background"
                 width="3440"
                 height="1440"></canvas>
         </div>
 
     <div class="btn-toolbar" id="toolbar">
-        <button class="btn" id="undo-draw">
+        <button class="btn" id="undo-draw" @onclick="() => UndoInvoke()">
             <img src="icons/undo.png" width="30" height="30" />
         </button>
 
         <button class="btn" id="redo-draw">
-            <img src="icons/redo.png" width="30" height="30" />
+            <img src="icons/redo.png" width="30" height="30" @onclick="RedoInvoke"/>
         </button>
 
-        <button class="btn" id="eraser-draw" @onclick="()=> EraserInvoke()" >
+        <button class="btn" id="eraser-draw" @onclick="EraserInvoke" >
             <img src="icons/eraser-icon.png" width="30" height="30" />
         </button>
 
-        <button class="btn" id="pencil-draw" @onclick="()=>PencilInvoke()">
+        <button class="btn" id="pencil-draw" @onclick="PencilInvoke">
             <img src="icons/pencil.png" width="30" height="30"/>
         </button>
-    </div>
+    </div> 
     </div>
 
     
@@ -34,22 +35,33 @@
   
 
 @code {
-    
-    async void PencilInvoke()
+
+    private async void PencilInvoke()
     {
         await JSruntime.InvokeVoidAsync("setModePencil");
     }
     
-   async void EraserInvoke()
+    private async void EraserInvoke()
     {
       await JSruntime.InvokeVoidAsync("setModeEraser");
     }
-   
+    
+    
+    private async void UndoInvoke()
+    {
+        await JSruntime.InvokeVoidAsync("undoDrawing");
+    }
+
+    private async void RedoInvoke()
+    {
+        await JSruntime.InvokeVoidAsync("redoDrawing");
+    }
+    
     protected override async Task OnAfterRenderAsync (bool firstRender)
     {
         if (firstRender)
         {
-          await JSruntime.InvokeVoidAsync("InitCanvas");
+          await JSruntime.InvokeVoidAsync("initCanvas");
         }
     }
    

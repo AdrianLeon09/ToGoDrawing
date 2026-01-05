@@ -32,7 +32,7 @@ namespace ToGoDrawing
             app.MapStaticAssets();
             app.MapRazorComponents<App>()
                 .AddInteractiveServerRenderMode();
-            app.MapHub<StrokesHub>("/SendStrokesServer");
+            app.MapHub<RoomStrokeHub>("/SendStrokesServer");
             app.Run();
         }
     }

@@ -27,35 +27,154 @@
         <button class="btn" id="pencil-draw" @onclick="PencilInvoke">
             <img src="icons/pencil.png" width="30" height="30"/>
         </button>
+
+        <button class="btn btn-primary" @onclick="ShowCreateRoom">Create Room</button>
+        <button class="btn btn-secondary" @onclick="ShowJoinRoom">Join Room</button>
     </div> 
+
+    @if (_show)
+    {
+        <div class="modal-overlay" @onclick="CloseModal">
+            <div class="custom-modal" @onclick:stopPropagation="true">
+                <h3>@_title</h3>
+            @if (_modalType != "share")
+            {
+                <input type="text" placeholder="@_placeholderUsername" @bind="_inputUsername" @onkeyup="HandleKeyUp" />
+            }
+                @if (_modalType == "join")
+                {
+                    <input type="text" placeholder="@_placeholderRoom" @bind="_inputRoomId" @onkeyup="HandleKeyUp" />
+                }
+                @if (_modalType == "share")
+                {
+                    <p>Comparte este código con tus amigos:</p>
+                    <input type="text" readonly value="@_inputRoomId" />
+                }
+                <div class="modal-actions">
+                    <button class="modal-btn modal-btn-secondary" @onclick="CloseModal">Cancelar</button>
+                    <button class="modal-btn modal-btn-primary" @onclick="HandleModalOk">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    }
     </div>
 
-    
-
-  
-
 @code {
+    private bool _show = false;
+    private string _title = "";
+    private string _placeholderUsername = "";
+    private string _placeholderRoom = "";
+    private string _inputUsername = "";
+    private string _inputRoomId = "";
+    private string _modalType = ""; // "create" o "join"
+    private string? _username = "";
+    private string _roomId = "";
+    private void ShowCreateRoom()
+    {
+        _title = "Crear Sala";
+        _placeholderUsername = "Ingrese su nombre de usuario";
+        _inputUsername = "";
+        _inputRoomId = "";
+        _modalType = "create";
+        _show = true;
+    }
 
-    private async void PencilInvoke()
+    private void ShowJoinRoom()
+    {
+        _title = "Unirse a Sala";
+        _placeholderUsername = "Ingrese el Username";
+        _placeholderRoom = "Ingrese el codigo de la sala";
+        //_inputUsername = "";
+        _inputRoomId = "";
+        _modalType = "join";
+        _show = true;
+    }
+
+    private void CloseModal()
+    {
+        _show = false;
+    }
+
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            HandleModalOk();
+        }
+        else if (e.Key == "Escape")
+        {
+            CloseModal();
+        }
+    }
+
+    private async Task HandleModalOk()
+    {
+        if (_modalType == "share")
+        {
+            _show = false;
+            return;
+        }
+
+        if (!string.IsNullOrWhiteSpace(_inputUsername))
+        {
+            if (_modalType == "create")
+            {
+                await JSruntime.InvokeVoidAsync("receiveUsername", _inputUsername);
+                await JSruntime.InvokeVoidAsync("createRoom");
+                await ReceiveRoomId();
+                _title = "Sala Creada";
+                _modalType = "share";
+                Console.WriteLine($"Room created for user: {_inputUsername}, Room ID: {_inputRoomId}");
+                StateHasChanged();
+                return;
+            }
+            else if (_modalType == "join")
+            {
+                if (!string.IsNullOrWhiteSpace(_inputRoomId))
+                {
+                    await JSruntime.InvokeVoidAsync("joinRoom", _inputRoomId);
+                    await JSruntime.InvokeVoidAsync("receiveUsername", _inputUsername);
+                    Console.WriteLine($"Joining room: {_inputRoomId} with user: {_inputUsername}");
+                }
+                else
+                {
+                    return;
+                }
+            }
+        }
+        else
+        {
+            return; 
+        }
+        _show = false;
+        StateHasChanged();
+    }
+
+    private async Task ReceiveRoomId()
+    {
+        _inputRoomId = await JSruntime.InvokeAsync<string>("sendRoomId");
+    }
+    
+    private async Task PencilInvoke()
     {
         await JSruntime.InvokeVoidAsync("setModePencil");
     }
     
-    private async void EraserInvoke()
+    private async Task EraserInvoke()
     {
       await JSruntime.InvokeVoidAsync("setModeEraser");
     }
     
-    
-    private async void UndoInvoke()
+    private async Task UndoInvoke()
     {
         await JSruntime.InvokeVoidAsync("undoDrawing");
     }
 
-    private async void RedoInvoke()
+    private async Task RedoInvoke()
     {
         await JSruntime.InvokeVoidAsync("redoDrawing");
     }
+    
     
     protected override async Task OnAfterRenderAsync (bool firstRender)
     {
@@ -64,5 +183,4 @@
           await JSruntime.InvokeVoidAsync("initCanvas");
         }
     }
-   
 }

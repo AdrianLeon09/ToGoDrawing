@@ -1,5 +1,6 @@
 ﻿// --- State & Constants ---
-const state = {
+const state = {username: "",
+    roomId:"",
     pencilMode: "",
     currentIndex: 0, // Index of the path currently rendered
     drawing: false,
@@ -17,46 +18,17 @@ window.canvasGlobal = {
     ctx: null
 };
 
-// --- SignalR Connection ---
-const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/SendStrokesServer")
-    .withAutomaticReconnect()
-    .build();
-
-async function startSignalR() {
-    try {
-        await connection.start();
-        console.log("SignalR Connected.");
-    } catch (err) {
-        console.error("SignalR Connection Error:", err);
-        setTimeout(startSignalR, 5000);
-    }
-}
-
-connection.onclose(async () => {
-    await startSignalR();
-});
-
-connection.on("ReceiveStrokes", (strokes) => {
-    console.log("Received strokes:", strokes);
-    state.externalStrokes = strokes;
-    window.DrawExternalStrokes(state.externalStrokes);
-});
-
 window.SendInternalStrokes = async function () {
-    if (connection.state === signalR.HubConnectionState.Connected) {
+    if (window.connection.state === signalR.HubConnectionState.Connected) {
         try {
-            await connection.invoke("SendStrokesServer", state.internalStrokes);
+            await window.connection.invoke("SendStrokesServer", state.username, state.internalStrokes, state.roomId);
         } catch (err) {
-            console.error("Error sending strokes:", err);
+            console.error("Error sending username or strokes:", err);
         }
     } else {
         console.warn("Connection not established yet");
     }
 };
-
-// Initialize SignalR
-startSignalR();
 
 // --- Canvas Utilities ---
 function getCanvasCoords(e, canvas) {
@@ -152,7 +124,7 @@ window.undoDrawing = function () {
     state.internalStrokes.pop();
     state.currentIndex = state.internalStrokes.length;
     
-    window.DrawExternalStrokes(state.externalStrokes);
+    window.DrawMapStrokes();
     window.SendInternalStrokes();
 };
 
@@ -164,16 +136,14 @@ window.redoDrawing = function () {
     state.internalStrokes.push(state.temporalInternalStrokes[state.currentIndex]);
     state.currentIndex++;
 
-    window.DrawExternalStrokes(state.externalStrokes);
+    window.DrawMapStrokes();
     window.SendInternalStrokes();
 };
 
-window.DrawExternalStrokes = function (externalStrokes) {
-    state.externalStrokes = externalStrokes;
-    clearCanvas();
-    window.renderDrawing(state.internalStrokes);
-    window.renderDrawing(state.externalStrokes);
-};
+window.receiveUsername = function (name) {
+    state.username = name;
+    console.log("Received username: ", state.username);
+}
 
 window.renderDrawing = function (strokes) {
     const ctx = window.canvasGlobal.ctx;

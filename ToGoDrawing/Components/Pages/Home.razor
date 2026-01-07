@@ -84,7 +84,6 @@
         _title = "Unirse a Sala";
         _placeholderUsername = "Ingrese el Username";
         _placeholderRoom = "Ingrese el codigo de la sala";
-        //_inputUsername = "";
         _inputRoomId = "";
         _modalType = "join";
         _show = true;
@@ -119,8 +118,8 @@
         {
             if (_modalType == "create")
             {
-                await JSruntime.InvokeVoidAsync("receiveUsername", _inputUsername);
-                await JSruntime.InvokeVoidAsync("createRoom");
+                await JSruntime.InvokeVoidAsync("ReceiveUsername", _inputUsername);
+                await JSruntime.InvokeVoidAsync("CreateRoom");
                 await ReceiveRoomId();
                 _title = "Sala Creada";
                 _modalType = "share";
@@ -132,8 +131,8 @@
             {
                 if (!string.IsNullOrWhiteSpace(_inputRoomId))
                 {
-                    await JSruntime.InvokeVoidAsync("joinRoom", _inputRoomId);
-                    await JSruntime.InvokeVoidAsync("receiveUsername", _inputUsername);
+                    await JSruntime.InvokeVoidAsync("JoinRoom", _inputRoomId);
+                    await JSruntime.InvokeVoidAsync("ReceiveUsername", _inputUsername);
                     Console.WriteLine($"Joining room: {_inputRoomId} with user: {_inputUsername}");
                 }
                 else
@@ -152,27 +151,27 @@
 
     private async Task ReceiveRoomId()
     {
-        _inputRoomId = await JSruntime.InvokeAsync<string>("sendRoomId");
+        _inputRoomId = await JSruntime.InvokeAsync<string>("SendRoomId");
     }
     
     private async Task PencilInvoke()
     {
-        await JSruntime.InvokeVoidAsync("setModePencil");
+        await JSruntime.InvokeVoidAsync("SetModePencil");
     }
     
     private async Task EraserInvoke()
     {
-      await JSruntime.InvokeVoidAsync("setModeEraser");
+      await JSruntime.InvokeVoidAsync("SetModeEraser");
     }
     
     private async Task UndoInvoke()
     {
-        await JSruntime.InvokeVoidAsync("undoDrawing");
+        await JSruntime.InvokeVoidAsync("UndoDrawing");
     }
 
     private async Task RedoInvoke()
     {
-        await JSruntime.InvokeVoidAsync("redoDrawing");
+        await JSruntime.InvokeVoidAsync("RedoDrawing");
     }
     
     
@@ -180,7 +179,7 @@
     {
         if (firstRender)
         {
-          await JSruntime.InvokeVoidAsync("initCanvas");
+          await JSruntime.InvokeVoidAsync("InitCanvas");
         }
     }
 }

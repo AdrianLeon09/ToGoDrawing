@@ -1,4 +1,4 @@
-const StrokeMap = new Map();
+let StrokeMap = ""
 
 // --- SignalR Connection ---
  window.connection = new signalR.HubConnectionBuilder()
@@ -6,49 +6,54 @@ const StrokeMap = new Map();
     .withAutomaticReconnect()
     .build();
 
-async function startSignalR() {
+async function StartSignalR() {
     try {
         await connection.start();
         console.log("SignalR Connected.");
     } catch (err) {
         console.error("SignalR Connection Error:", err);
-        setTimeout(startSignalR, 5000);
+        setTimeout(StartSignalR, 5000);
     }
 }
-startSignalR();
+StartSignalR();
 
-connection.on("ReceiveStrokes", (name, strokes) => {
-    console.log("Received strokes:", name, strokes);
-    StrokeMap.set(name, strokes);
+connection.on("ReceiveStrokes", (user, strokesDictionary) => {
+    console.log("Received strokes CONNECTION:", user, strokesDictionary);
+    StrokeMap = strokesDictionary
     window.DrawMapStrokes();
 });
+
 connection.onclose(async () => {
-    await startSignalR();
+    await StartSignalR();
 });
 
 window.DrawMapStrokes = function () {
-    clearCanvas();
-   for(let [key, value] of StrokeMap){
-    console.log(key);
-    window.renderDrawing(value);
+    ClearCanvas();
+   for(const[key, value] of Object.entries(StrokeMap)){
+       
+    window.RenderDrawing(value);
    }
-    window.renderDrawing(state.internalStrokes);
-   
+    window.RenderDrawing(state.internalStrokes);
 };
 
-window.createRoom = async function () {
- const id = await connection.invoke("CreateRoom");
+window.CreateRoom = async function () {
+ const id = await connection.invoke("CreateRoom", state.username, state.internalStrokes);
  console.log("Room created: ", id);
  state.roomId = id;
  return id;
 }
 
-window.joinRoom = async function (roomId) {
+window.JoinRoom = async function (roomId) {
     await connection.invoke("JoinRoom", roomId);
     state.roomId = roomId;
+   await RenewRoom();
 }
 
-window.sendRoomId  = async function() {
+window.SendRoomId  = async function() {
     console.log("Sending room id", state.roomId);
     return state.roomId;
+}
+
+window.RenewRoom = async function () {
+ await  connection.invoke("RenewRoom", state.roomId);
 }

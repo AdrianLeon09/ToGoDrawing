@@ -16,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Infraestructure\" />
     <Folder Include="Presentation\" />
   </ItemGroup>
 

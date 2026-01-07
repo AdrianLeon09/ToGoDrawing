@@ -21,7 +21,7 @@ window.canvasGlobal = {
 window.SendInternalStrokes = async function () {
     if (window.connection.state === signalR.HubConnectionState.Connected) {
         try {
-            await window.connection.invoke("SendStrokesServer", state.username, state.internalStrokes, state.roomId);
+            await window.connection.invoke("SendStrokesServer", state.roomId, state.username, state.internalStrokes);
         } catch (err) {
             console.error("Error sending username or strokes:", err);
         }
@@ -31,7 +31,7 @@ window.SendInternalStrokes = async function () {
 };
 
 // --- Canvas Utilities ---
-function getCanvasCoords(e, canvas) {
+function GetCanvasCoords(e, canvas) {
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
     const scaleY = canvas.height / rect.height;
@@ -42,7 +42,7 @@ function getCanvasCoords(e, canvas) {
     };
 }
 
-function clearCanvas() {
+function ClearCanvas() {
     if (window.canvasGlobal.ctx && window.canvasGlobal.canvas) {
         window.canvasGlobal.ctx.clearRect(0, 0, window.canvasGlobal.canvas.width, window.canvasGlobal.canvas.height);
     }
@@ -50,7 +50,7 @@ function clearCanvas() {
 
 // --- Public API (Window Functions) ---
 
-window.initCanvas = function () {
+window.InitCanvas = function () {
     const canvas = document.getElementById("drawing-background");
     if (!canvas) {
         console.error("Canvas element 'drawing-background' not found.");
@@ -69,13 +69,13 @@ window.initCanvas = function () {
         state.currentIndex = state.internalStrokes.length;
         state.drawing = true;
 
-        const pos = getCanvasCoords(e, canvas);
+        const pos = GetCanvasCoords(e, canvas);
         lastX = pos.x;
         lastY = pos.y;
     });
 
     canvas.addEventListener("mousemove", (e) => {
-        const pos = getCanvasCoords(e, canvas);
+        const pos = GetCanvasCoords(e, canvas);
 
         if (state.drawing) {
             if (state.pencilMode === "pencil") {
@@ -115,7 +115,7 @@ window.initCanvas = function () {
     canvas.addEventListener("mouseleave", handleMouseUpOrLeave);
 };
 
-window.undoDrawing = function () {
+window.UndoDrawing = function () {
     if (state.internalStrokes.length === 0) {
         console.log("There are no more drawings to Undo");
         return;
@@ -128,7 +128,7 @@ window.undoDrawing = function () {
     window.SendInternalStrokes();
 };
 
-window.redoDrawing = function () {
+window.RedoDrawing = function () {
     if (state.currentIndex >= state.temporalInternalStrokes.length) {
         return;
     }
@@ -136,16 +136,17 @@ window.redoDrawing = function () {
     state.internalStrokes.push(state.temporalInternalStrokes[state.currentIndex]);
     state.currentIndex++;
 
-    window.DrawMapStrokes();
     window.SendInternalStrokes();
+    window.DrawMapStrokes();
+    
 };
 
-window.receiveUsername = function (name) {
-    state.username = name;
+window.ReceiveUsername = function (user) {
+    state.username = user;
     console.log("Received username: ", state.username);
 }
 
-window.renderDrawing = function (strokes) {
+window.RenderDrawing = function (strokes) {
     const ctx = window.canvasGlobal.ctx;
     if (!ctx || !strokes) return;
 
@@ -161,14 +162,14 @@ window.renderDrawing = function (strokes) {
     });
 };
 
-window.setModePencil = function () {
+window.SetModePencil = function () {
     if (window.canvasGlobal.canvas) {
         window.canvasGlobal.canvas.style.cursor = "url('icons/point.png') 16 16, auto";
     }
     state.pencilMode = "pencil";
 };
 
-window.setModeEraser = function () {
+window.SetModeEraser = function () {
     if (window.canvasGlobal.canvas) {
         window.canvasGlobal.canvas.style.cursor = "url('icons/eraser-cursor32px.png') 0 0, auto";
     }

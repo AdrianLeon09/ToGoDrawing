@@ -1,4 +1,6 @@
+using ToGoDrawing.Application;
 using ToGoDrawing.Components;
+using ToGoDrawing.Infraestructure;
 using ToGoDrawing.Presentation.Hubs;
 
 namespace ToGoDrawing
@@ -17,6 +19,7 @@ namespace ToGoDrawing
             {
                 options.MaximumReceiveMessageSize = 2024 * 2024; // 1MB en lugar de 32KB
             });
+            builder.Services.AddSingleton<IRoomPersistence, RoomPersistence>();
             
             var app = builder.Build();
             // Configure the HTTP request pipeline.

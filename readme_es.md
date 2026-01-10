@@ -154,9 +154,7 @@ La clase `RoomPersistence` es responsable de crear y mantener este diccionario e
 - JavaScript (Vanilla)
 - HTML5 Canvas
 - Blazor&#x20;
-
-
-
+- 
 ---
 
 ## 📌 Estado del Proyecto
@@ -175,6 +173,5 @@ Desarrollador enfocado en Backend con C#
 ---
 
 > Proyecto desarrollado con fines educativos, enfocado en arquitectura, tiempo real y buenas prácticas de desarrollo.
-
 
 ---

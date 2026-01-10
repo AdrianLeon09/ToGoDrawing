@@ -2,7 +2,7 @@
 
 🇵🇹 ¿Fala português? [Ir para a documentação](https://github.com/AdrianLeon09/ToGoDrawing/blob/master/readme_pt.md)
 
-# ToGoDrawing (English)
+# ToGoDrawing
 
 **ToGoDrawing** is a **real-time collaborative drawing web application**, developed as an **MVP** using **C#**, **JavaScript**, **ASP.NET 9**, and **SignalR**.
 

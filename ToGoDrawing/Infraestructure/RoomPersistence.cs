@@ -4,7 +4,6 @@ namespace ToGoDrawing.Infraestructure;
 
 public class RoomPersistence : IRoomPersistence
 {
-    private Dictionary<string, List<StrokeDto>> _userStrokeDictionary = new();
     private static Dictionary<string, Dictionary<string, List<StrokeDto>>> _dictionaryOfRoomPersistences = new();
 
     public RoomPersistence(){}

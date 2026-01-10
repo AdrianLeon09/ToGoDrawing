@@ -123,21 +123,24 @@ window.UndoDrawing = function () {
 
     state.internalStrokes.pop();
     state.currentIndex = state.internalStrokes.length;
-    
-    window.DrawMapStrokes();
+    console.log(state.currentIndex);
+   
     window.SendInternalStrokes();
+    window.DrawMapStrokes();
 };
 
 window.RedoDrawing = function () {
-    if (state.currentIndex >= state.temporalInternalStrokes.length) {
+    if (state.currentIndex === state.temporalInternalStrokes.length) {
+        console.log("there are no more drawings to redo");
         return;
     }
 
     state.internalStrokes.push(state.temporalInternalStrokes[state.currentIndex]);
     state.currentIndex++;
-
+  console.log(state.currentIndex);
     window.SendInternalStrokes();
     window.DrawMapStrokes();
+    
     
 };
 

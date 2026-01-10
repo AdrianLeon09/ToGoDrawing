@@ -47,12 +47,12 @@
                 }
                 @if (_modalType == "share")
                 {
-                    <p>Comparte este código con tus amigos:</p>
+                    <p>Share this code with your friends::</p>
                     <input type="text" readonly value="@_inputRoomId" />
                 }
                 <div class="modal-actions">
-                    <button class="modal-btn modal-btn-secondary" @onclick="CloseModal">Cancelar</button>
-                    <button class="modal-btn modal-btn-primary" @onclick="HandleModalOk">Aceptar</button>
+                    <button class="modal-btn modal-btn-secondary" @onclick="CloseModal">Cancel</button>
+                    <button class="modal-btn modal-btn-primary" @onclick="HandleModalOk">OK</button>
                 </div>
             </div>
         </div>
@@ -71,8 +71,8 @@
     private string _roomId = "";
     private void ShowCreateRoom()
     {
-        _title = "Crear Sala";
-        _placeholderUsername = "Ingrese su nombre de usuario";
+        _title = "Create Room";
+        _placeholderUsername = "Enter your username";
         _inputUsername = "";
         _inputRoomId = "";
         _modalType = "create";
@@ -81,9 +81,9 @@
 
     private void ShowJoinRoom()
     {
-        _title = "Unirse a Sala";
-        _placeholderUsername = "Ingrese el Username";
-        _placeholderRoom = "Ingrese el codigo de la sala";
+        _title = "Join Room";
+        _placeholderUsername = "Enter your username";
+        _placeholderRoom = "Enter the room code";
         _inputRoomId = "";
         _modalType = "join";
         _show = true;
@@ -121,7 +121,7 @@
                 await JSruntime.InvokeVoidAsync("ReceiveUsername", _inputUsername);
                 await JSruntime.InvokeVoidAsync("CreateRoom");
                 await ReceiveRoomId();
-                _title = "Sala Creada";
+                _title = "Room Created";
                 _modalType = "share";
                 Console.WriteLine($"Room created for user: {_inputUsername}, Room ID: {_inputRoomId}");
                 StateHasChanged();

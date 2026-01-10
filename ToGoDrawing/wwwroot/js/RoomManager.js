@@ -29,11 +29,13 @@ connection.onclose(async () => {
 
 window.DrawMapStrokes = function () {
     ClearCanvas();
-   for(const[key, value] of Object.entries(StrokeMap)){
-       
-    window.RenderDrawing(value);
-   }
     window.RenderDrawing(state.internalStrokes);
+   for(const[key, value] of Object.entries(StrokeMap)){
+       if (key !== state.username){
+           window.RenderDrawing(value);
+       }
+       
+   }
 };
 
 window.CreateRoom = async function () {
@@ -44,6 +46,7 @@ window.CreateRoom = async function () {
 }
 
 window.JoinRoom = async function (roomId) {
+    state.internalStrokes.splice(0, state.internalStrokes.length);
     await connection.invoke("JoinRoom", roomId);
     state.roomId = roomId;
    await RenewRoom();

@@ -1,5 +1,5 @@
 
-# Real-Time Drawing App (Português)
+# ToGoDrawing (Português)
 
 **Real-Time Drawing App** é uma aplicação web de **desenho colaborativo em tempo real**, desenvolvida como um **MVP** utilizando **C#**, **JavaScript**, **ASP.NET 9** e **SignalR**.
 

@@ -1,6 +1,7 @@
-# Real-Time Drawing App
+# ToGoDrawing
 
-**Real-Time Drawing App** es una aplicación web de **dibujo colaborativo en tiempo real**, desarrollada como un **MVP** utilizando **C#**, **JavaScript**, **ASP.NET 9** y **SignalR**.
+
+**ToGoDrawing** es una aplicación web de **dibujo colaborativo en tiempo real**, desarrollada como un **MVP** utilizando **C#**, **JavaScript**, **ASP.NET 9** y **SignalR**.
 
 La aplicación permite que múltiples usuarios dibujen simultáneamente sobre un mismo canvas compartido, organizados en **salas (rooms)**, sin necesidad de registro ni autenticación. El foco principal del proyecto está en la **comunicación en tiempo real**, la **sincronización de estado** y una arquitectura clara y extensible.
 

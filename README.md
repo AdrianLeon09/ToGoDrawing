@@ -2,9 +2,9 @@
 
 🇵🇹 ¿Fala português? [Ir para a documentação](https://github.com/AdrianLeon09/ToGoDrawing/blob/master/readme_pt.md)
 
-# Real-Time Drawing App (English)
+# ToGoDrawing (English)
 
-**Real-Time Drawing App** is a **real-time collaborative drawing web application**, developed as an **MVP** using **C#**, **JavaScript**, **ASP.NET 9**, and **SignalR**.
+**ToGoDrawing** is a **real-time collaborative drawing web application**, developed as an **MVP** using **C#**, **JavaScript**, **ASP.NET 9**, and **SignalR**.
 
 The application allows multiple users to draw simultaneously on a shared canvas, organized into **rooms**, with no registration or authentication required. The main focus of the project is **real-time communication**, **state synchronization**, and a clear and extensible architecture.
 

@@ -1,3 +1,6 @@
+🇪🇸 ¿Hablas español? [Ir a la documentacion](https://github.com/AdrianLeon09/ToGoDrawing/blob/master/readme_es.md)
+
+🇵🇹 ¿Fala português? [Ir para a documentação](https://github.com/AdrianLeon09/ToGoDrawing/blob/master/readme_pt.md)
 
 # Real-Time Drawing App (English)
 

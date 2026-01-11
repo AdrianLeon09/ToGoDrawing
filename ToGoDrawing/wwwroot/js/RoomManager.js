@@ -34,7 +34,6 @@ window.DrawMapStrokes = function () {
        if (key !== state.username){
            window.RenderDrawing(value);
        }
-       
    }
 };
 
@@ -49,6 +48,7 @@ window.JoinRoom = async function (roomId) {
     state.internalStrokes.splice(0, state.internalStrokes.length);
     await connection.invoke("JoinRoom", roomId);
     state.roomId = roomId;
+    state.color = randomColor().toString();
    await RenewRoom();
 }
 
@@ -60,3 +60,4 @@ window.SendRoomId  = async function() {
 window.RenewRoom = async function () {
  await  connection.invoke("RenewRoom", state.roomId);
 }
+

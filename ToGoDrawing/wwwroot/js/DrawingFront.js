@@ -1,4 +1,5 @@
 ﻿// --- State & Constants ---
+
 const state = {username: "",
     roomId:"",
     pencilMode: "",
@@ -10,7 +11,8 @@ const state = {username: "",
     lastSendTime: 0,
     sendInterval: 30, // milliseconds
     defaultSizeEraser: 20,
-    currentStrokeIndex: 0
+    currentStrokeIndex: 0,
+    color : "#000000" //Default
 };
 
 window.canvasGlobal = {
@@ -64,7 +66,7 @@ window.InitCanvas = function () {
     let lastY = 0;
 
     canvas.addEventListener("mousedown", (e) => {
-        state.internalStrokes.push({ points: [], color: "#000000" });
+        state.internalStrokes.push({ points: [], color: state.color });
         state.currentStrokeIndex = state.internalStrokes.length - 1;
         state.currentIndex = state.internalStrokes.length;
         state.drawing = true;
@@ -80,6 +82,7 @@ window.InitCanvas = function () {
         if (state.drawing) {
             if (state.pencilMode === "pencil") {
                 ctx.beginPath();
+                ctx.strokeStyle = state.color;
                 ctx.moveTo(lastX, lastY);
                 ctx.lineTo(pos.x, pos.y);
                 state.internalStrokes[state.currentStrokeIndex].points.push({ x: pos.x, y: pos.y });
@@ -156,6 +159,7 @@ window.RenderDrawing = function (strokes) {
     strokes.forEach(stroke => {
         if (stroke.points && stroke.points.length > 0) {
             ctx.beginPath();
+            ctx.strokeStyle = stroke.color;
             ctx.moveTo(stroke.points[0].x, stroke.points[0].y);
             stroke.points.forEach(p => {
                 ctx.lineTo(p.x, p.y);
@@ -178,4 +182,3 @@ window.SetModeEraser = function () {
     }
     state.pencilMode = "eraser";
 };
-    

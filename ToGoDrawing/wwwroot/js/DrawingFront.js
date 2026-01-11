@@ -123,11 +123,9 @@ window.UndoDrawing = function () {
         console.log("There are no more drawings to Undo");
         return;
     }
-
     state.internalStrokes.pop();
     state.currentIndex = state.internalStrokes.length;
     console.log(state.currentIndex);
-   
     window.SendInternalStrokes();
     window.DrawMapStrokes();
 };
@@ -143,13 +141,10 @@ window.RedoDrawing = function () {
   console.log(state.currentIndex);
     window.SendInternalStrokes();
     window.DrawMapStrokes();
-    
-    
 };
 
 window.ReceiveUsername = function (user) {
     state.username = user;
-    console.log("Received username: ", state.username);
 }
 
 window.RenderDrawing = function (strokes) {

@@ -17,7 +17,7 @@ public class RoomPersistence : IRoomPersistence
         }
         else
         {
-            Console.WriteLine(roomid + "always exist");
+            Console.WriteLine("The room " + roomid + " already exist");
         }
     }
     
@@ -27,7 +27,7 @@ public class RoomPersistence : IRoomPersistence
         {
             key[username] = strokeDto;
         }
-        else{Console.WriteLine(roomid + " doesn't exist");}
+        Console.WriteLine("The room " + roomid + " doesn't exist");
     }
 
     public IReadOnlyDictionary<string, List<StrokeDto>> GetRoomDictionary(string roomid)
@@ -38,12 +38,10 @@ public class RoomPersistence : IRoomPersistence
         }
         else
         {
-           Console.WriteLine(roomid + " doesn't exist");
+           Console.WriteLine("The room " + roomid + " doesn't exist");
            return null;
         }
     }
-    
-
 }
   
 

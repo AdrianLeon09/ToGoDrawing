@@ -53,7 +53,6 @@ window.JoinRoom = async function (roomId) {
 }
 
 window.SendRoomId  = async function() {
-    console.log("Sending room id", state.roomId);
     return state.roomId;
 }
 

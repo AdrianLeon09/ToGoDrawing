@@ -1,7 +1,9 @@
 ﻿@page "/"
+@using ToGoDrawing.Application
 @rendermode InteractiveServer
 
 @inject IJSRuntime JSruntime
+@inject IRoomPersistence roomPersistence
 
     <div class="page">
         
@@ -50,6 +52,12 @@
                     <p>Share this code with your friends::</p>
                     <input type="text" readonly value="@_inputRoomId" />
                 }
+                @if (!string.IsNullOrEmpty(_errorMessage))
+                {
+                    <div class="alert alert-danger" style="margin-top: 10px; padding: 5px; font-size: 0.9em;">
+                        @_errorMessage
+                    </div>
+                }
                 <div class="modal-actions">
                     <button class="modal-btn modal-btn-secondary" @onclick="CloseModal">Cancel</button>
                     <button class="modal-btn modal-btn-primary" @onclick="HandleModalOk">OK</button>
@@ -67,10 +75,12 @@
     private string _inputUsername = "";
     private string _inputRoomId = "";
     private string _modalType = ""; // "create" o "join"
+    private string _errorMessage = "";
     private string? _username = "";
     private string _roomId = "";
     private void ShowCreateRoom()
     {
+        _errorMessage = "";
         _title = "Create Room";
         _placeholderUsername = "Enter your username";
         _inputUsername = "";
@@ -81,6 +91,7 @@
 
     private void ShowJoinRoom()
     {
+        _errorMessage = "";
         _title = "Join Room";
         _placeholderUsername = "Enter your username";
         _placeholderRoom = "Enter the room code";
@@ -91,6 +102,7 @@
 
     private void CloseModal()
     {
+        _errorMessage = "";
         _show = false;
     }
 
@@ -108,43 +120,51 @@
 
     private async Task HandleModalOk()
     {
+        _errorMessage = "";
         if (_modalType == "share")
         {
             _show = false;
             return;
         }
 
-        if (!string.IsNullOrWhiteSpace(_inputUsername))
+        if (string.IsNullOrWhiteSpace(_inputUsername))
         {
-            if (_modalType == "create")
+            _errorMessage = "Username is required";
+            return;
+        }
+
+        if (_modalType == "create")
+        {
+            await JSruntime.InvokeVoidAsync("ReceiveUsername", _inputUsername);
+            await JSruntime.InvokeVoidAsync("CreateRoom");
+            await ReceiveRoomId();
+            _title = "Room Created";
+            _modalType = "share";
+            Console.WriteLine($"Room created for user: {_inputUsername}, Room ID: {_inputRoomId}");
+            StateHasChanged();
+            return;
+        }
+        else if (_modalType == "join")
+        {
+            if (string.IsNullOrWhiteSpace(_inputRoomId))
             {
-                await JSruntime.InvokeVoidAsync("ReceiveUsername", _inputUsername);
-                await JSruntime.InvokeVoidAsync("CreateRoom");
-                await ReceiveRoomId();
-                _title = "Room Created";
-                _modalType = "share";
-                Console.WriteLine($"Room created for user: {_inputUsername}, Room ID: {_inputRoomId}");
-                StateHasChanged();
+                _errorMessage = "Room code is required";
                 return;
             }
-            else if (_modalType == "join")
+
+            if (roomPersistence.GetRoomDictionary(_inputRoomId) != null)
             {
-                if (!string.IsNullOrWhiteSpace(_inputRoomId))
-                {
-                    await JSruntime.InvokeVoidAsync("JoinRoom", _inputRoomId);
-                    await JSruntime.InvokeVoidAsync("ReceiveUsername", _inputUsername);
-                    Console.WriteLine($"Joining room: {_inputRoomId} with user: {_inputUsername}");
-                }
-                else
-                {
-                    return;
-                }
+                await JSruntime.InvokeVoidAsync("JoinRoom", _inputRoomId);
+                await JSruntime.InvokeVoidAsync("ReceiveUsername", _inputUsername);
+                Console.WriteLine($"Joining room: {_inputRoomId} with user: {_inputUsername}");
+            }
+            else
+            {
+                _errorMessage = "The room does not exist";
+                return;
             }
         }
-        else
-        {
-            return; 
-        }
+        
         _show = false;
         StateHasChanged();
     }

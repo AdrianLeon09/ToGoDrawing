@@ -5,12 +5,14 @@ using ToGoDrawing.Infraestructure;
 
 namespace ToGoDrawing.Presentation.Hubs
 {
-    public class RoomStrokeHub(IRoomPersistence roomPersistence) : Hub
+    public class RoomStrokeHub(IRoomPersistence roomPersistence, ClientsInGroupService clientService) : Hub
     {
         private IRoomPersistence _roomPersistence = roomPersistence;
+        private ClientsInGroupService _clientsInGroupService = clientService;
 
         public async Task SendStrokesServer(string roomid, string username, List<StrokeDto> strokes)
         {
+            
             if (!string.IsNullOrWhiteSpace(roomid) || !string.IsNullOrWhiteSpace(username) || strokes.Count != 0)
             {
                 _roomPersistence.AddToDictionary(roomid, username, strokes);
@@ -30,6 +32,8 @@ namespace ToGoDrawing.Presentation.Hubs
                 Guid randomid = Guid.NewGuid();
                 _roomPersistence.CreatePersistence(randomid.ToString(), username, strokes);
                 await Groups.AddToGroupAsync(Context.ConnectionId, randomid.ToString());
+                
+                _clientsInGroupService.Dictionary.Add(randomid.ToString(), new List<string>(){Context.ConnectionId});
                 return randomid.ToString(); 
             }
             else
@@ -44,13 +48,10 @@ namespace ToGoDrawing.Presentation.Hubs
         {
             if (_roomPersistence.GetRoomDictionary(roomid) != null)
             {
+                _clientsInGroupService.Dictionary[roomid].Add(Context.ConnectionId);
                 await Groups.AddToGroupAsync(Context.ConnectionId, roomid);
-            }
-            else
-            {
-                Console.WriteLine("Room ID =  " + roomid + "not exists");
-            }
-            
+            } 
+            Console.WriteLine("Room ID =  " + roomid + "not exists");
         }
 
         public async Task  RenewRoom(string roomid)
@@ -65,7 +66,18 @@ namespace ToGoDrawing.Presentation.Hubs
                 Console.WriteLine("It is not possible to renew the room, the roomID does not exist.");
             }
         }
+
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+             foreach (var client in _clientsInGroupService.Dictionary)
+             {
+                client.Value.Remove(Context.ConnectionId);
+             }
+             _clientsInGroupService.CleanUnusedMemory();
+             return base.OnDisconnectedAsync(exception);
+        }
     }
+    
 }
 
  

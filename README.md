@@ -135,15 +135,6 @@ The `RoomPersistence` class is responsible for creating and maintaining this in-
 3. Design a clear and extensible architecture
 4. Establish a foundation for future features
 5. Create a functional collaborative drawing application
-
----
-
-## 🚀 Future Improvements
-
-- Local persistence
-- Additional drawing tools
-- Synchronization optimization
-
 ---
 
 ## 🛠️ Technologies Used

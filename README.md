@@ -8,6 +8,14 @@
 
 The application allows multiple users to draw simultaneously on a shared canvas, organized into **rooms**, with no registration or authentication required. The main focus of the project is **real-time communication**, **state synchronization**, and a clear and extensible architecture.
 
+https://github.com/user-attachments/assets/8e9fda80-3460-446c-935d-fa8bc3300dc6
+
+
+https://github.com/user-attachments/assets/9e632799-fc8a-4e02-bd3d-93384eb09dd5
+
+
+
+
 ---
 
 ## 🎯 Use Cases
@@ -153,6 +161,11 @@ The `RoomPersistence` class is responsible for creating and maintaining this in-
 🚧 **In development (MVP)**
 
 The application already supports real-time collaborative drawing with multiple users connected simultaneously.
+
+---
+## 📌 How To run
+
+Clone repository and run.
 
 ---
 

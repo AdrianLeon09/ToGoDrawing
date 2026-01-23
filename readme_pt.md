@@ -135,14 +135,6 @@ A classe `RoomPersistence` é responsável por criar e manter esse dicionário e
 
 ---
 
-## 🚀 Próximas Melhorias
-
-- Persistência local
-- Mais ferramentas de desenho
-- Otimização da sincronização
-
----
-
 ## 🛠️ Tecnologias Utilizadas
 
 - .NET 9

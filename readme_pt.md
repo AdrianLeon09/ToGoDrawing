@@ -154,6 +154,12 @@ A aplicação já permite desenho colaborativo em tempo real com múltiplos usu�
 
 ---
 
+## 📌 Como executar
+
+Clone o repositório e execute.
+
+---
+
 ## 🧑‍💻 Autor
 
 **Adrián León**  

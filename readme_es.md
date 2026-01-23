@@ -156,6 +156,11 @@ La clase `RoomPersistence` es responsable de crear y mantener este diccionario e
 La aplicación ya permite dibujo colaborativo en tiempo real con múltiples usuarios conectados simultáneamente.
 
 ---
+## 📌 Como Ejecutar
+
+Clona el repositorio y ejecutalo.
+
+---
 
 ## 🧑‍💻 Autor
 

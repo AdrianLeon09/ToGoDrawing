@@ -17,11 +17,12 @@ async function StartSignalR() {
 }
 StartSignalR();
 
-connection.on("ReceiveStrokes", (user, strokesDictionary) => {
-    console.log("Received strokes CONNECTION:", user, strokesDictionary);
-    StrokeMap = strokesDictionary
-    window.DrawMapStrokes();
-});
+    connection.on("ReceiveStrokes", (user, strokesDictionary) => {
+        console.log("Received strokes CONNECTION:", user, strokesDictionary);
+        StrokeMap = strokesDictionary
+        window.DrawMapStrokes();
+    });
+
 
 connection.onclose(async () => {
     await StartSignalR();
@@ -38,13 +39,15 @@ window.DrawMapStrokes = function () {
 };
 
 window.CreateRoom = async function () {
+    state.inRoom = true;
  const id = await connection.invoke("CreateRoom", state.username, state.internalStrokes);
  console.log("Room created: ", id);
- state.roomId = id;
+    state.roomId = id;
  return id;
 }
 
 window.JoinRoom = async function (roomId) {
+    state.inRoom = true;
     state.internalStrokes.splice(0, state.internalStrokes.length);
     await connection.invoke("JoinRoom", roomId);
     state.roomId = roomId;

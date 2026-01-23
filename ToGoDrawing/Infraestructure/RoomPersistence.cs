@@ -49,6 +49,11 @@ public IReadOnlyDictionary<string, List<StrokeDto>> GetRoomDictionary(string roo
            return null;
         }
     }
+
+    public Dictionary<string, Dictionary<string, List<StrokeDto>>> GetRoomDictionaryState()
+    {
+        return _dictionaryOfRoomPersistences;
+    }
 }
   
 

@@ -1,7 +1,8 @@
 ﻿// --- State & Constants ---
 
 const state = {username: "",
-    roomId:"",
+    roomId: "",
+    inRoom: false,
     pencilMode: "",
     currentIndex: 0, // Index of the path currently rendered
     drawing: false,
@@ -21,7 +22,7 @@ window.canvasGlobal = {
 };
 
 window.SendInternalStrokes = async function () {
-    if (window.connection.state === signalR.HubConnectionState.Connected) {
+    if (state.inRoom && signalR.HubConnectionState.Connected) {
         try {
             await window.connection.invoke("SendStrokesServer", state.roomId, state.username, state.internalStrokes);
         } catch (err) {
@@ -76,7 +77,7 @@ window.InitCanvas = function () {
         lastY = pos.y;
     });
 
-    canvas.addEventListener("mousemove", (e) => {
+    canvas.addEventListener("mousemove", async (e) => {
         const pos = GetCanvasCoords(e, canvas);
 
         if (state.drawing) {
@@ -85,7 +86,7 @@ window.InitCanvas = function () {
                 ctx.strokeStyle = state.color;
                 ctx.moveTo(lastX, lastY);
                 ctx.lineTo(pos.x, pos.y);
-                state.internalStrokes[state.currentStrokeIndex].points.push({ x: pos.x, y: pos.y });
+                state.internalStrokes[state.currentStrokeIndex].points.push({x: pos.x, y: pos.y});
                 ctx.stroke();
                 lastX = pos.x;
                 lastY = pos.y;
@@ -96,8 +97,8 @@ window.InitCanvas = function () {
             // Throttle SignalR updates
             const now = Date.now();
             if (now - state.lastSendTime > state.sendInterval) {
-                window.SendInternalStrokes();
-                state.lastSendTime = now;
+                await window.SendInternalStrokes();
+                state.lastSendTime = now ;
             }
         }
     });
@@ -118,7 +119,7 @@ window.InitCanvas = function () {
     canvas.addEventListener("mouseleave", handleMouseUpOrLeave);
 };
 
-window.UndoDrawing = function () {
+window.UndoDrawing = async function () {
     if (state.internalStrokes.length === 0) {
         console.log("There are no more drawings to Undo");
         return;
@@ -126,11 +127,11 @@ window.UndoDrawing = function () {
     state.internalStrokes.pop();
     state.currentIndex = state.internalStrokes.length;
     console.log(state.currentIndex);
-    window.SendInternalStrokes();
+    await window.SendInternalStrokes();
     window.DrawMapStrokes();
 };
 
-window.RedoDrawing = function () {
+window.RedoDrawing = async function () {
     if (state.currentIndex === state.temporalInternalStrokes.length) {
         console.log("there are no more drawings to redo");
         return;
@@ -138,8 +139,8 @@ window.RedoDrawing = function () {
 
     state.internalStrokes.push(state.temporalInternalStrokes[state.currentIndex]);
     state.currentIndex++;
-  console.log(state.currentIndex);
-    window.SendInternalStrokes();
+    console.log(state.currentIndex);
+    await window.SendInternalStrokes();
     window.DrawMapStrokes();
 };
 

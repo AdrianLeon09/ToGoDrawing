@@ -18,7 +18,7 @@ namespace ToGoDrawing
             
             builder.Services.AddSignalR(options =>
             {
-                options.MaximumReceiveMessageSize = 2024 * 2024; // 1MB en lugar de 32KB
+                options.MaximumReceiveMessageSize = 2024 * 2024; // 1MB
             });
             builder.Services.AddSingleton<IRoomPersistence, RoomPersistence>();
             builder.Services.AddSingleton<ClientsInGroupService>();
